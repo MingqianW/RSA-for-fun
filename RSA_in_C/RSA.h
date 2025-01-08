@@ -13,11 +13,14 @@ typedef struct RSA {
     long long phi;
     long long (*encrypt)(struct RSA *self, char* plaintext);
     long long (*decrypt)(struct RSA *self, long long ciphertext, char* plaintext_out);
-
+    long long (*encrypt_num)(struct RSA *self, long long plaintext);
+    long long (*decrypt_num)(struct RSA *self, long long ciphertext);
 } RSA;
 
 long long encrypt_impl(struct RSA *self, char* plaintext);
 long long decrypt_impl(struct RSA *self, long long ciphertext, char* plaintext_out);
+long long encrypt_num_impl(struct RSA *self, long long plaintext);
+long long decrypt_num_impl(struct RSA *self, long long ciphertext);
 
 RSA *new_rsa();
 void delete_rsa(RSA *rsa);

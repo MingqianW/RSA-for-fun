@@ -20,26 +20,48 @@ void test_rsa_numbers() {
     printf("e: %llu, d: %llu\n", rsa->e, rsa->d);
 
     // Test encryption and decryption with a number
-    unsigned long long plaintext = 12345; // Example number to encrypt
-    unsigned long long ciphertext, decrypted;
+    unsigned long long plaintnumber = 123; // Example number to encrypt
+    unsigned long long ciphernumber, decryptednumber;
 
-    printf("Plaintext Number: %llu\n", plaintext);
+    printf("Plaintext Number: %llu\n", plaintnumber);
 
     // Encrypt the number
-    ciphertext = power_mod_helper(plaintext, rsa->e, rsa->n);
-    printf("Ciphertext: %llu\n", ciphertext);
+    ciphernumber = rsa->encrypt_num(rsa, plaintnumber);
+    printf("Ciphertext: %llu\n", ciphernumber);
 
     // Decrypt the number
-    decrypted = power_mod_helper(ciphertext, rsa->d, rsa->n);
-    printf("Decrypted Number: %llu\n", decrypted);
+    decryptednumber = rsa->decrypt_num(rsa, ciphernumber);
+    printf("Decrypted Number: %llu\n", decryptednumber);
 
     // Validate the result
-    if (plaintext == decrypted) {
+    if (plaintnumber == decryptednumber) {
         printf("Test Passed: Decrypted number matches original plaintext.\n");
     } else {
         printf("Test Failed: Decrypted number does not match original plaintext.\n");
     }
+    char plaintext[] = "Hi"; // Example string to encrypt
+    char decrypted[128]; // Ensure sufficient space for decryption output
+    unsigned long long ciphertext;
 
+    printf("Plaintext String: %s\n", plaintext);
+
+    // Encrypt the string
+    ciphertext = rsa->encrypt(rsa, plaintext);
+    printf("Ciphertext: %llu\n", ciphertext);
+
+    // Decrypt the string
+    if (rsa->decrypt(rsa, ciphertext, decrypted) == 0) {
+        printf("Decrypted String: %s\n", decrypted);
+
+        // Validate the result
+        if (strcmp(plaintext, decrypted) == 0) {
+            printf("Test Passed: Decrypted string matches original plaintext.\n");
+        } else {
+            printf("Test Failed: Decrypted string does not match original plaintext.\n");
+        }
+    } else {
+        fprintf(stderr, "Error: Decryption failed.\n");
+    }
     // Cleanup
     delete_rsa(rsa);
 }

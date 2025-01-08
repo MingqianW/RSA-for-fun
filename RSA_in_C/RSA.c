@@ -2,6 +2,8 @@
 
 long long encrypt_impl(struct RSA *self, char* plaintext);
 long long decrypt_impl(struct RSA *self, long long ciphertext, char* plaintext_out);
+long long encrypt_num_impl(struct RSA *self, long long plaintext);
+long long decrypt_num_impl(struct RSA *self, long long ciphertext);
 
 static const unsigned int prime_list[] = { // prime less than 1000
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
@@ -22,7 +24,8 @@ static const unsigned int prime_list[] = { // prime less than 1000
 static const unsigned int prime_list_length =sizeof(prime_list) / sizeof(prime_list[0]);
 
 unsigned long long generate_large_odd_number() {
-    unsigned long long num = ((unsigned int)rand() << 16) | (unsigned int)rand();
+    //unsigned long long num = ((unsigned int)rand() << 16) | (unsigned int)rand();
+    unsigned long long num = (unsigned int)rand();
     return num | 1;
     }
 
@@ -111,6 +114,8 @@ unsigned long long mod_inverse(unsigned long long a, unsigned long long n) {
 
 RSA *new_rsa() {
     RSA* rsa = (RSA*)malloc(sizeof(RSA));
+    // rsa->p = find_large_prime(20);
+    // rsa->q = find_large_prime(20);;
     rsa->p = find_large_prime(20);
     rsa->q = find_large_prime(20);;
     rsa->n = rsa->p * rsa->q;
@@ -119,6 +124,8 @@ RSA *new_rsa() {
     rsa->d = mod_inverse(rsa->e, rsa->phi); 
     rsa->encrypt = encrypt_impl;
     rsa->decrypt = decrypt_impl;
+    rsa->encrypt_num = encrypt_num_impl;
+    rsa->decrypt_num = decrypt_num_impl;
     return rsa;
 }
 
@@ -133,6 +140,7 @@ long long encrypt_impl(struct RSA *self, char* plaintext) {
     for (int i = 0; plaintext[i] != '\0'; i++) {
         message_ASCII = (message_ASCII << 8) | (unsigned char)plaintext[i]; 
     }
+    printf("Message ASCII: %lld\n", message_ASCII);
 
     // Encrypt the integer using RSA: C = M^e mod n
     return power_mod_helper(message_ASCII, self->e, self->n);
@@ -157,4 +165,11 @@ long long decrypt_impl(struct RSA *self, long long ciphertext, char* plaintext_o
         plaintext_out[len - 1 - j] = temp;
     }
    return 0;
+}
+
+long long encrypt_num_impl(struct RSA *self, long long plaintext){
+    return power_mod_helper(plaintext, self->e, self->n);
+}
+long long decrypt_num_impl(struct RSA *self, long long ciphertext) {
+    return power_mod_helper(ciphertext, self->d, self->n);
 }
