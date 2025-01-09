@@ -139,6 +139,7 @@ long long encrypt_impl(struct RSA *self, char* plaintext) {
     long long message_ASCII = 0;
     for (int i = 0; plaintext[i] != '\0'; i++) {
         message_ASCII = (message_ASCII << 8) | (unsigned char)plaintext[i]; 
+        message_ASCII = message_ASCII % self->n; // Apply modular reduction to avoid overflow
     }
     printf("Message ASCII: %lld\n", message_ASCII);
 

@@ -39,7 +39,7 @@ void test_rsa_numbers() {
     } else {
         printf("Test Failed: Decrypted number does not match original plaintext.\n");
     }
-    char plaintext[] = "Hi"; // Example string to encrypt
+    char plaintext[] = "Hel"; // Example string to encrypt
     char decrypted[128]; // Ensure sufficient space for decryption output
     unsigned long long ciphertext;
 
