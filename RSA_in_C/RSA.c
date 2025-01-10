@@ -139,11 +139,9 @@ long long encrypt_impl(struct RSA *self, char* plaintext) {
     long long message_ASCII = 0;
     for (int i = 0; plaintext[i] != '\0'; i++) {
         message_ASCII = (message_ASCII << 8) | (unsigned char)plaintext[i]; 
-        message_ASCII = message_ASCII % self->n; // Apply modular reduction to avoid overflow
+        message_ASCII = message_ASCII % self->n;
     }
-    printf("Message ASCII: %lld\n", message_ASCII);
-
-    // Encrypt the integer using RSA: C = M^e mod n
+    //printf("Message ASCII: %lld\n", message_ASCII);
     return power_mod_helper(message_ASCII, self->e, self->n);
 }
 
@@ -152,13 +150,11 @@ long long decrypt_impl(struct RSA *self, long long ciphertext, char* plaintext_o
     long long message_ASCII = power_mod_helper(ciphertext, self->d, self->n);
     int i = 0;
     while (message_ASCII > 0) {
-        plaintext_out[i] = (char)(message_ASCII & 0xFF);  // Extract one character
+        plaintext_out[i] = (char)(message_ASCII & 0xFF);
         i++;
-        message_ASCII = message_ASCII >> 8;  // Remove the extracted character
+        message_ASCII = message_ASCII >> 8;
     }
     plaintext_out[i] = '\0';
-
-    // Reverse the string to get the original order
     int len = strlen(plaintext_out);
     for (int j = 0; j < len / 2; j++) {
         char temp = plaintext_out[j];

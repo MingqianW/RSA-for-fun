@@ -8,7 +8,7 @@
 #include <unistd.h> // For getpid()
 
 typedef struct RSA {
-    mpz_t p; // p and q are two large primes with large difference, we let them be 32 bit here
+    mpz_t p; // p and q are two large primes with large difference, we let them be 1024 bit here
     mpz_t q; 
     mpz_t n; // Modulus and n = pq
     mpz_t e;

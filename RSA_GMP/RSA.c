@@ -4,7 +4,7 @@ void encrypt_impl(struct RSA *self, const char* plaintext, mpz_t ciphertext);
 void decrypt_impl(struct RSA *self, const mpz_t ciphertext, char* plaintext_out);
 void encrypt_num_impl(struct RSA *self, const mpz_t plaintext, mpz_t ciphertext);
 void decrypt_num_impl(struct RSA *self, const mpz_t ciphertext, mpz_t plaintext);
-
+/*
 // generate_random_n_bit_odd_numbe is done by gpt
 unsigned long int generate_unique_seed() {
     struct timespec ts;
@@ -37,7 +37,7 @@ void generate_random_n_bit_odd_number(mpz_t result, unsigned int n) {
     gmp_randclear(state);
 }
 
-
+*/
 
 void find_large_prime(mpz_t prime, unsigned int bits) {
     gmp_randstate_t state;
@@ -90,9 +90,7 @@ RSA *new_rsa() {
     rsa->decrypt = decrypt_impl;
     rsa->encrypt_num = encrypt_num_impl;
     rsa->decrypt_num = decrypt_num_impl;
-    gmp_printf("RSA Key Details: p=%Zd, q=%Zd, n=%Zd, phi=%Zd, e=%Zd, d=%Zd\n",
-               rsa->p, rsa->q, rsa->n, rsa->phi, rsa->e, rsa->d);
-
+    //gmp_printf("RSA Key Details: p=%Zd, q=%Zd, n=%Zd, phi=%Zd, e=%Zd, d=%Zd\n",rsa->p, rsa->q, rsa->n, rsa->phi, rsa->e, rsa->d);
     return rsa;
 }
 
