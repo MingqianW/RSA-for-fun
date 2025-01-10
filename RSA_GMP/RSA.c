@@ -65,10 +65,15 @@ RSA *new_rsa() {
     mpz_init(rsa->phi);
     mpz_init(rsa->e);
     mpz_init(rsa->d);
-    find_large_prime(rsa->p, 128);
-    while (mpz_cmp(rsa->p, rsa->q) == 0) {
-        find_large_prime(rsa->q, 128);
-    }
+    find_large_prime(rsa->p, 1024);
+    mpz_t p_double;
+    mpz_init(p_double);
+    mpz_t num;
+    mpz_init(num);
+    mpz_set_ui(num, 2);
+    mpz_mul(p_double, rsa->p, num);
+    mpz_nextprime(rsa->q, p_double);
+    mpz_clear(p_double);
     mpz_mul(rsa->n, rsa->p, rsa->q);
     mpz_t q_minus1;
     mpz_init(q_minus1);
@@ -85,6 +90,9 @@ RSA *new_rsa() {
     rsa->decrypt = decrypt_impl;
     rsa->encrypt_num = encrypt_num_impl;
     rsa->decrypt_num = decrypt_num_impl;
+    gmp_printf("RSA Key Details: p=%Zd, q=%Zd, n=%Zd, phi=%Zd, e=%Zd, d=%Zd\n",
+               rsa->p, rsa->q, rsa->n, rsa->phi, rsa->e, rsa->d);
+
     return rsa;
 }
 
@@ -102,26 +110,18 @@ void delete_rsa(RSA *rsa) {
 
 void encrypt_impl(struct RSA *self, const char* plaintext, mpz_t ciphertext) {
     mpz_t message_ASCII;
-    printf("This is line number: %Zd\n", __LINE__);
     mpz_init(message_ASCII);
-    printf("This is line number: %Zd\n", __LINE__);
     mpz_set_ui(message_ASCII, 0);
-    printf("This is line number: %Zd\n", __LINE__);
-    printf("This is line number: %Zd\n", message_ASCII);
-    for (int i = 0; plaintext[i] != '\0'; i++) {
-        printf("This is line number: %Zd\n", message_ASCII);
-        mpz_mul_ui(message_ASCII, message_ASCII, 256);
-        printf("This is line number: %Zd\n", message_ASCII);
-        mpz_add_ui(message_ASCII, message_ASCII, (unsigned char)plaintext[i]);
-        printf("This is line number: %Zd\n", message_ASCII);
-        mpz_mod(message_ASCII, message_ASCII, self->n);
-        printf("This is line number: %Zd\n", message_ASCII);
-    }
-    printf("This is line number: %Zd\n", __LINE__);
-    mpz_powm(ciphertext, message_ASCII, self->e, self->n);
 
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        mpz_mul_ui(message_ASCII, message_ASCII, 256);
+        mpz_add_ui(message_ASCII, message_ASCII, (unsigned char)plaintext[i]);
+        mpz_mod(message_ASCII, message_ASCII, self->n);
+    }
+    mpz_powm(ciphertext, message_ASCII, self->e, self->n);
     mpz_clear(message_ASCII);
 }
+
 
 void decrypt_impl(struct RSA *self, const mpz_t ciphertext, char* plaintext_out) {
     mpz_t message_ASCII;

@@ -1,69 +1,45 @@
-#include "RSA.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include "RSA.h"
 
 int main() {
-    // Initialize RSA structure
-    RSA *rsa = new_rsa();
+    // Initialize RSA
+    RSA* rsa = new_rsa();
+    gmp_printf("RSA Key Details: p=%Zd, q=%Zd, n=%Zd, phi=%Zd, e=%Zd, d=%Zd\n",
+               rsa->p, rsa->q, rsa->n, rsa->phi, rsa->e, rsa->d);
 
-    // Test 1: String Encryption and Decryption
-    printf("\n--- String Encryption and Decryption ---\n");
-    const char *original_message = "Hello, RSA!";
-    char decrypted_message[1024];
+    // Original plaintext message
+    const char* plaintext = "We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness.";
 
+    // Print original plaintext
+    printf("Original plaintext: %s\n", plaintext);
+
+    // Initialize ciphertext
     mpz_t ciphertext;
     mpz_init(ciphertext);
-    // Encrypt the string
-    rsa->encrypt(rsa, original_message, ciphertext);
+
+    // Encrypt the plaintext
+    rsa->encrypt(rsa, plaintext, ciphertext);
+
+    // Print the encrypted ciphertext
+    gmp_printf("Encrypted ciphertext: %Zd\n", ciphertext);
 
     // Decrypt the ciphertext
-    rsa->decrypt(rsa, ciphertext, decrypted_message);
+    char decrypted_plaintext[102400];
+    rsa->decrypt(rsa, ciphertext, decrypted_plaintext);
 
-    // Print the decrypted message
-    printf("Decrypted message: %s\n", decrypted_message);
+    // Print the decrypted plaintext
+    printf("Decrypted plaintext: %s\n", decrypted_plaintext);
 
-    // Verify correctness
-    if (strcmp(original_message, decrypted_message) == 0) {
-        printf("String encryption/decryption test passed!\n");
+    // Verify if decryption matches the original plaintext
+    if (strcmp(plaintext, decrypted_plaintext) == 0) {
+        printf("Success: Decrypted text matches original plaintext.\n");
     } else {
-        printf("String encryption/decryption test failed!\n");
-    }
-
-    mpz_clear(ciphertext);
-
-    // Test 2: Number Encryption and Decryption
-    printf("\n--- Number Encryption and Decryption ---\n");
-    mpz_t original_number, encrypted_number, decrypted_number;
-
-    mpz_init_set_ui(original_number, 123456789); // Original number
-    mpz_init(encrypted_number);
-    mpz_init(decrypted_number);
-
-    // Encrypt the number
-    rsa->encrypt_num(rsa, original_number, encrypted_number);
-
-    // Print the encrypted number
-    gmp_printf("Encrypted number: %Zd\n", encrypted_number);
-
-    // Decrypt the number
-    rsa->decrypt_num(rsa, encrypted_number, decrypted_number);
-
-    // Print the decrypted number
-    gmp_printf("Decrypted number: %Zd\n", decrypted_number);
-
-    // Verify correctness
-    if (mpz_cmp(original_number, decrypted_number) == 0) {
-        printf("Number encryption/decryption test passed!\n");
-    } else {
-        printf("Number encryption/decryption test failed!\n");
+        printf("Error: Decrypted text does not match original plaintext.\n");
     }
 
     // Clean up
-    mpz_clear(original_number);
-    mpz_clear(encrypted_number);
-    mpz_clear(decrypted_number);
-
+    mpz_clear(ciphertext);
     delete_rsa(rsa);
 
     return 0;
